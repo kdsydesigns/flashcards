@@ -8,24 +8,31 @@ function App() {
   const [stats, setStats] = useState({ total: 0, swipes: 0 });
 
   const handleFileUpload = (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
+  const file = event.target.files[0];
+  if (!file) return;
 
-    Papa.parse(file, {
-      header: true,
-      complete: (results) => {
-        const parsedCards = results.data
-          .filter((row) => row.question && row.answer)
-          .map((row) => ({
-            question: row.question.trim(),
-            answer: row.answer.trim(),
-          }));
-        setCards(parsedCards);
-        setFinished(false);
-        setStats({ total: parsedCards.length, swipes: 0 });
-      },
-    });
-  };
+  Papa.parse(file, {
+    header: true,
+    skipEmptyLines: true,
+    complete: (results) => {
+      console.log("Parsed CSV:", results.data); // 👈 Debugging tip
+
+      const parsedCards = results.data
+        .filter((row) => row.question || row.Question) // case-insensitive
+        .map((row) => ({
+          question: (row.question || row.Question || "").trim(),
+          answer: (row.answer || row.Answer || "").trim(),
+        }))
+        .filter((card) => card.question && card.answer);
+
+      setCards(parsedCards);
+      setFinished(false);
+      setStats({ total: parsedCards.length, swipes: 0 });
+    },
+  });
+};
+
+
 
   const handleFinish = (swipes) => {
     setStats((prev) => ({ ...prev, swipes }));

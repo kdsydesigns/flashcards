@@ -2,17 +2,17 @@
 import React, { useState } from "react";
 import "./Flashcard.css";
 
-const Flashcard = ({ question, answer, onSwipe }) => {
+const Flashcard = ({ question, answer, onSwipe, canGoPrevious, onPrevious }) => {
   const [flipped, setFlipped] = useState(false);
 
   const handleChoice = (direction) => {
-    // Step 1: Flip back to question
+    // Flip back before moving on
     setFlipped(false);
 
-    // Step 2: After animation (~600ms from CSS), move to next card
+    // Match CSS transition duration
     setTimeout(() => {
       onSwipe(direction);
-    }, 600); // must match transition duration in Flashcard.css
+    }, 600);
   };
 
   return (
@@ -31,6 +31,20 @@ const Flashcard = ({ question, answer, onSwipe }) => {
             <button onClick={() => handleChoice("right")}>✅ Knew it</button>
             <button onClick={() => handleChoice("left")}>❌ Didn’t Know</button>
           </div>
+          {/* Previous button (only if allowed) */}
+          {canGoPrevious && (
+            <button
+              className="previous-btn"
+              onClick={() => {
+                setFlipped(false);
+                setTimeout(() => {
+                  onPrevious();
+                }, 300);
+              }}
+            >
+              ⬅ Previous
+            </button>
+          )}
         </div>
       </div>
     </div>
